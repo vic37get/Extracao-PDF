@@ -11,3 +11,7 @@ def getIdArquivo(df, indice):
 
 def getIdLicitacao(df, indice):
     return str(int(df.iloc[indice].ID_LICITACAO))
+
+def removeArquivosPDF(diretorio):
+    for arquivo in os.listdir(diretorio):
+        os.remove(os.path.join(diretorio, arquivo))
