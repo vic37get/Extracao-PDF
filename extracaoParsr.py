@@ -21,9 +21,9 @@ except:
 
 
 parsr.send_document(
-    file_path='190518-132145.pdf',
+    file_path=str(arquivoPDF),
     config_path='./defaultConfig.json',
-    document_name='Sample File2',
+    document_name='{}-{}'.format(id_licitacao, id_arquivo),
     wait_till_finished=False,
     save_request_id=True,
 )
