@@ -40,7 +40,7 @@
   "output": {
     "granularity": "word",
     "includeMarginals": false,
-    "includeDrawings": false,
+    "includeDrawings": true,
     "formats": {
       "json": true,
       "text": true,
