@@ -29,9 +29,9 @@ def classifier(pdf_file):
                 continue
             image_percent = image_area/total_area*100
             text_percent = text_area/total_area*100
-            if(image_percent>90):
+            if(image_percent>75):
                 res.append(0)
-            elif(text_percent>90):
+            elif(text_percent>75):
                 res.append(1)
             else:
                 res.append(-1)
@@ -65,10 +65,12 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 OUTPUT_TYPE_DATAFRAME = './tipos.csv'
-def saveData():
+def saveData(save=True):
     result = []
     progress = tqdm(total=len(INPUT_DATAFRAME))
     for file in INPUT_DATAFRAME.index:
+        if(file>4000):
+            break
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         progress.update(1)
@@ -77,19 +79,25 @@ def saveData():
         if file_pdf == None:
             continue
         if Path(file_pdf).suffix != '.pdf':
+            removeArquivosPDF(DIR_ARQUIVOS)
             continue
         type_pdf = classifier_pdf(file_pdf)
         if(type_pdf==0):
             result.append([id_licitacao,id_arquivo,'image'])
+            ...
         if(type_pdf==1):
             result.append([id_licitacao,id_arquivo,'text'])
+            ...
         if(type_pdf==-1):
             result.append([id_licitacao,id_arquivo,'half'])
+            ...
         if(type_pdf==-2):
             result.append([id_licitacao,id_arquivo,'empty'])
+            ...
         removeArquivosPDF(DIR_ARQUIVOS)
-    df = pd.DataFrame(result)
-    df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
-    df.to_csv(OUTPUT_TYPE_DATAFRAME,index=False,sep=',')
+    if save:
+        df = pd.DataFrame(result)
+        df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
+        df.to_csv(OUTPUT_TYPE_DATAFRAME,index=False,sep=',')
             
 saveData()
