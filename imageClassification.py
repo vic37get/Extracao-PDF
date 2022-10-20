@@ -24,6 +24,9 @@ def classifier(pdf_file):
                     r = fitz.Rect(b[:4])
                     text_area = text_area + abs(r)
             total_area = image_area+text_area
+            if(total_area==0):
+                res.append(-2)
+                continue
             image_percent = image_area/total_area*100
             text_percent = text_area/total_area*100
             if(image_percent>90):
@@ -82,6 +85,8 @@ def saveData():
             result.append([id_licitacao,id_arquivo,'text'])
         if(type_pdf==-1):
             result.append([id_licitacao,id_arquivo,'half'])
+        if(type_pdf==-2):
+            result.append([id_licitacao,id_arquivo,'empty'])
         removeArquivosPDF(DIR_ARQUIVOS)
     df = pd.DataFrame(result)
     df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
