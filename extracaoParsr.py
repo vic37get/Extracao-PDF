@@ -67,8 +67,9 @@ def ExtractText(INPUT_DATAFRAME):
     saveFile(FAILED_FILES, 'FailedFiles.txt')
 
 #ExtractText(INPUT_DATAFRAME)
-dados = readMarkDownFile('4242-766.md')
-texto = markDownToText(dados)
+if __name__ == "__main__":
+    dados = readMarkDownFile('4242-766.md')
+    texto = markDownToText(dados)
 
 
 

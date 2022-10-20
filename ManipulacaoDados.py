@@ -13,7 +13,8 @@ def getIdLicitacao(df, indice):
 
 def removeArquivosPDF(diretorio):
     for arquivo in os.listdir(diretorio):
-        os.remove(os.path.join(diretorio, arquivo))
+        if(arquivo.find('.git')) == -1:
+            os.remove(os.path.join(diretorio, arquivo))
 
 def saveFile(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
