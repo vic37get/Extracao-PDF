@@ -5,7 +5,6 @@ from regularExpressions import removeTextAspose
 
 def markDownToText(text_markdown):
     text_markdown = removeTextAspose(text_markdown)
-    print(text_markdown)
     text_html = markdown(text_markdown)
     #text = ''.join(BeautifulSoup(text_html).findall(text=True))
     return text_html #text

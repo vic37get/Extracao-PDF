@@ -7,3 +7,4 @@ python-magic
 tqdm
 Markdown
 beautifulsoup4
+PDFNetPython3
