@@ -57,7 +57,7 @@ def ExtractText(INPUT_DATAFRAME):
         if file_pdf != None:
             p = Path(file_pdf)
             if p.suffix.find('.doc')!=-1:
-                file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS, BASE_DIR)
+                file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS)
                 os.remove(p.name)
                 os.chdir(BASE_DIR)
             PDFtoText(file_pdf, id_licitacao, id_arquivo)
@@ -67,10 +67,11 @@ def ExtractText(INPUT_DATAFRAME):
     saveFile(FAILED_FILES, 'FailedFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
-#ExtractText(INPUT_DATAFRAME)
+#
 if __name__ == "__main__":
-    dados = readMarkDownFile('4242-766.md')
-    texto = markDownToText(dados)
+    #dados = readMarkDownFile('4242-766.md')
+    #exto = markDownToText(dados)
+    ExtractText(INPUT_DATAFRAME)
 
 
 
