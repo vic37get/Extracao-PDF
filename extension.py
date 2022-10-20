@@ -3,7 +3,7 @@ import requests
 import re
 from pathlib import Path
 
-ext_set = {".pdf"}
+ext_set = set()
 def getExt(id_licitacao, id_arquivo):
     URL = 'http://sistemas.tce.pi.gov.br/muralic/api/licitacoes/{}/arquivos/{}'.format(id_licitacao, id_arquivo) 
     response = requests.get(URL)
@@ -12,6 +12,8 @@ def getExt(id_licitacao, id_arquivo):
     if(extension.suffix == ''):
         ext_set.add('No-Extension')
     else:
+        if(extension.suffix == '.docx'):
+            print(id_licitacao, id_arquivo)
         ext_set.add(extension.suffix)
     #print(content_dis,extension)
 
