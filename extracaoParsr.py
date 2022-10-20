@@ -7,6 +7,8 @@ import re
 import os
 from pathlib import Path
 import aspose.words as aw
+from tqdm import tqdm
+from manipulacaoMarkdown import markDownToText, readMarkDownFile
 
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 DIR_DESTINO = 'arquivos/arquivosTXT'
@@ -43,8 +45,9 @@ def PDFtoText(arquivoPDF, id_licitacao, id_arquivo):
 
 def ExtractText(INPUT_DATAFRAME):
     FAILED_FILES = []
+    progress = tqdm(total=len(INPUT_DATAFRAME))
     for file in INPUT_DATAFRAME.index:
-        if file == 5:
+        if file == 20:
             break
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
@@ -59,9 +62,18 @@ def ExtractText(INPUT_DATAFRAME):
             PDFtoText(file_pdf, id_licitacao, id_arquivo)
             removeArquivosPDF(DIR_ARQUIVOS)
         else:
-            FAILED_FILES.append('{}-{}'.format(id_licitacao, id_arquivo))
+            FAILED_FILES.append('{}-{}\n'.format(id_licitacao, id_arquivo))
+        progress.update(1)
     saveFile(FAILED_FILES, 'FailedFiles.txt')
 
+#ExtractText(INPUT_DATAFRAME)
+dados = readMarkDownFile('4242-766.md')
+texto = markDownToText(dados)
+print(texto)
+
+
+
+'''
 def ExtractTextf():
     FAILED_FILES = []
     id_arquivo = '133985'
@@ -79,6 +91,7 @@ def ExtractTextf():
         removeArquivosPDF(DIR_ARQUIVOS)
     else:
         FAILED_FILES.append('{}-{}'.format(id_licitacao, id_arquivo))
+'''
 #ExtractText(INPUT_DATAFRAME)
 # 13753 1827 / 13833 1914
 #ExtractTextf()
@@ -89,6 +102,3 @@ for page in range(0, doc.page_count):
     extractedPage = doc.extract_pages(page, 1)
     extractedPage.save(f"Output_{page + 1}.jpg")'''
 #PDFtoText(doc, '1', '2')
-
-
-

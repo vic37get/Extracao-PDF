@@ -4,3 +4,6 @@ pandas
 wget
 aspose-words
 python-magic
+tqdm
+Markdown
+beautifulsoup4
