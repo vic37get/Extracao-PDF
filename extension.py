@@ -15,7 +15,6 @@ def getExt(id_licitacao, id_arquivo):
         if(extension.suffix == '.docx'):
             print(id_licitacao, id_arquivo)
         ext_set.add(extension.suffix)
-    #print(content_dis,extension)
 
 import pandas as pd
 

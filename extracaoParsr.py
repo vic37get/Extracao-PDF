@@ -1,4 +1,3 @@
-from lib2to3.pytree import convert
 from conexao import conect
 from manipulacaoDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout
 import wget
@@ -69,6 +68,4 @@ def ExtractText(INPUT_DATAFRAME):
     removeArquivosPDF(DIR_ARQUIVOS)
 
 if __name__ == "__main__":
-    #dados = readMarkDownFile('4242-766.md')
-    #exto = markDownToText(dados)
     ExtractText(INPUT_DATAFRAME)
