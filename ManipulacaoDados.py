@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from contextlib import contextmanager
+import sys
 
 def readCsv(arquivo):
     dados = pd.read_csv(arquivo, sep=',', encoding='utf-8')
@@ -20,3 +22,13 @@ def saveFile(data, filename):
     with open(filename, 'w', encoding='utf-8') as file:
         for file_failed in data:
             file.write(file_failed)
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
