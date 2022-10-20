@@ -67,7 +67,11 @@ def ExtractText(INPUT_DATAFRAME):
     saveFile(FAILED_FILES, 'FailedFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
-ExtractText(INPUT_DATAFRAME)
+#ExtractText(INPUT_DATAFRAME)
+if __name__ == "__main__":
+    dados = readMarkDownFile('4242-766.md')
+    texto = markDownToText(dados)
+
 
 
 '''
