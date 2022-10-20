@@ -2,4 +2,8 @@ tika
 parsr-client
 pandas
 wget
-os
+aspose-words
+python-magic
+tqdm
+Markdown
+beautifulsoup4
