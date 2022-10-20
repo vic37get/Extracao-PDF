@@ -6,6 +6,7 @@ from pathlib import Path
 from extracaoParsr import INPUT_DATAFRAME,DIR_ARQUIVOS,downloadPDF,removeArquivosPDF
 from ManipulacaoDados import getIdArquivo,getIdLicitacao
 from tqdm import tqdm
+from convertDocAndDocx import docAndDocxToPdf
 
 def classifier(pdf_file):
     with open(pdf_file,"rb") as f:
@@ -67,10 +68,10 @@ def suppress_stdout():
 OUTPUT_TYPE_DATAFRAME = './tipos.csv'
 def saveData(save=True):
     result = []
+    err = []
     progress = tqdm(total=len(INPUT_DATAFRAME))
+    pwd = os.path.abspath('.')
     for file in INPUT_DATAFRAME.index:
-        if(file>4000):
-            break
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         progress.update(1)
@@ -78,26 +79,33 @@ def saveData(save=True):
             file_pdf = downloadPDF(id_licitacao, id_arquivo)
         if file_pdf == None:
             continue
-        if Path(file_pdf).suffix != '.pdf':
-            removeArquivosPDF(DIR_ARQUIVOS)
-            continue
-        type_pdf = classifier_pdf(file_pdf)
-        if(type_pdf==0):
-            result.append([id_licitacao,id_arquivo,'image'])
-            ...
-        if(type_pdf==1):
-            result.append([id_licitacao,id_arquivo,'text'])
-            ...
-        if(type_pdf==-1):
-            result.append([id_licitacao,id_arquivo,'half'])
-            ...
-        if(type_pdf==-2):
-            result.append([id_licitacao,id_arquivo,'empty'])
-            ...
+        p = Path(file_pdf)
+        if p.suffix.find('.doc')!=-1:
+            file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS)
+            os.remove(p.name)
+            os.chdir(pwd)
+        try:
+            type_pdf = classifier_pdf(file_pdf)
+            if(type_pdf==0):
+                result.append([id_licitacao,id_arquivo,'image'])
+                ...
+            if(type_pdf==1):
+                result.append([id_licitacao,id_arquivo,'text'])
+                ...
+            if(type_pdf==-1):
+                result.append([id_licitacao,id_arquivo,'half'])
+                ...
+            if(type_pdf==-2):
+                result.append([id_licitacao,id_arquivo,'empty'])
+                ...
+        except:
+            err.append(file_pdf)
         removeArquivosPDF(DIR_ARQUIVOS)
     if save:
         df = pd.DataFrame(result)
         df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
         df.to_csv(OUTPUT_TYPE_DATAFRAME,index=False,sep=',')
+    with open('err.txt','w',encoding='utf-8') as f:
+        f.write(err)
             
 saveData()
