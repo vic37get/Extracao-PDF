@@ -1,7 +1,7 @@
 from os import remove
 from markdown import markdown
 from bs4 import BeautifulSoup
-from regularExpressions import removeTextAspose
+from utils.regularExpressions import removeTextAspose
 
 def markDownToText(text_markdown):
     text_markdown = removeTextAspose(text_markdown)

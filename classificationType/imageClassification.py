@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-from extracaoParsr import INPUT_DATAFRAME,DIR_ARQUIVOS,downloadPDF,removeArquivosPDF
-from manipulacaoDados import getIdArquivo,getIdLicitacao
+from extracts.extracaoParsr import INPUT_DATAFRAME,DIR_ARQUIVOS,downloadPDF,removeArquivosPDF
+from manipulations.manipulationDados import getIdArquivo,getIdLicitacao
 from tqdm import tqdm
 
 def classifier(pdf_file):

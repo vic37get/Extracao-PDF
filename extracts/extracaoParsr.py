@@ -1,14 +1,14 @@
-from conexao import conect
-from manipulacaoDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout
+from utils.conexao import conect
+from manipulations.manipulationDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout
 import wget
 import magic
-from filename import lista as lista_filename
+from utils.filename import lista as lista_filename
 import re
 import os
 from pathlib import Path
 from tqdm import tqdm
-from manipulacaoMarkdown import markDownToText, readMarkDownFile
-from convertDocAndDocx import docAndDocxToPdf
+from manipulations.manipulationMarkdown import markDownToText, readMarkDownFile
+from conversions.convertDocAndDocx import docAndDocxToPdf
 
 BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
