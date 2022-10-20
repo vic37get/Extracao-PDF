@@ -69,7 +69,6 @@ def ExtractText(INPUT_DATAFRAME):
 #ExtractText(INPUT_DATAFRAME)
 dados = readMarkDownFile('4242-766.md')
 texto = markDownToText(dados)
-print(texto)
 
 
 
