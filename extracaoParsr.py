@@ -78,7 +78,7 @@ def ExtractText():
     saveFile(FAILED_CONVERSION, 'docAndDocxFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
-    def saveDocuments():
+    def saveFiles():
         progress = tqdm(total=len(INPUT_DATAFRAME))
         for file in INPUT_DATAFRAME.index:
             id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
@@ -91,4 +91,4 @@ def ExtractText():
 
 if __name__ == "__main__":
     #ExtractText()
-    saveDocuments()
+    saveFiles()
