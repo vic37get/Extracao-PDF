@@ -33,6 +33,11 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+def createFolder(NAMEDIR, OUT_DIR):
+    DIR = os.path.join(OUT_DIR, NAMEDIR)
+    if not os.path.exists(DIR):
+        os.mkdir(NAMEDIR)
+
 def concatDF():
     lic_2018_2022 = pd.read_csv('editais_lic_2018_2022.csv',sep=',',encoding='utf-8')
     lic_2007_2017 = pd.read_csv('licitacoes_2007_2017.csv',sep=';',encoding='utf-8')
@@ -45,3 +50,5 @@ def concatDF():
 
     lic_2007_2022 = pd.concat([lic_2007_2017,lic_2018_2022])
     lic_2007_2022.to_csv('lic_2007_2022.csv',index=False,encoding='utf-8')
+
+createFolder('teste', '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF')

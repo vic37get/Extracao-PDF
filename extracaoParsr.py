@@ -1,5 +1,5 @@
 from utils.conexao import conect
-from manipulations.manipulationDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout
+from manipulations.manipulationDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout, createFolder
 import wget
 import magic
 from utils.filename import lista as lista_filename
@@ -11,6 +11,7 @@ from conversions.convertDocAndDocx import docAndDocxToPdf
 import shutil
 
 BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
+#BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 DIR_DESTINO = 'arquivos/arquivosTXT'
 OUT_DIR = '/var/projetos/arquivos'
@@ -28,7 +29,7 @@ def downloadPDF(id_licitacao, id_arquivo, OUT_DIR):
         tipo = magic.from_file(file)
         os.rename(file, file+getExtension(tipo))
         file = file+getExtension(tipo)
-        NEW_DIR = Path(OUT_DIR).joinpath('arquivos_'+getExtension(tipo))
+        NEW_DIR = Path(OUT_DIR).joinpath(createFolder('arquivos_'+getExtension(tipo), OUT_DIR))
         filename = Path(file).name
         NEW_DIR = NEW_DIR.joinpath(filename)
         shutil.move(file, NEW_DIR)
@@ -59,7 +60,7 @@ def ExtractText(INPUT_DATAFRAME):
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         #with suppress_stdout():
             #file_pdf = downloadPDF(id_licitacao, id_arquivo)
-        file_pdf = downloadPDF(id_licitacao, id_arquivo)
+        file_pdf = downloadPDF(id_licitacao, id_arquivo, OUT_DIR)
         if file_pdf != None:
             PDFtoText(file_pdf, id_licitacao, id_arquivo)
             '''pathPdfFile = Path(file_pdf)
@@ -81,4 +82,5 @@ def ExtractText(INPUT_DATAFRAME):
     removeArquivosPDF(DIR_ARQUIVOS)
 
 if __name__ == "__main__":
-    ExtractText(INPUT_DATAFRAME)
+    #ExtractText(INPUT_DATAFRAME)
+    downloadPDF
