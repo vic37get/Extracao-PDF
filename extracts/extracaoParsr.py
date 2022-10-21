@@ -45,7 +45,7 @@ def PDFtoText(arquivoPDF, id_licitacao, id_arquivo):
     return parsr
 
 def ExtractText(INPUT_DATAFRAME):
-    FAILED_FILES = []
+    FAILED_DOWNLOAD, FAILED_CONVERSION = [], []
     progress = tqdm(total=len(INPUT_DATAFRAME))
     for file in INPUT_DATAFRAME.index:
         '''if file == 20:
@@ -55,16 +55,20 @@ def ExtractText(INPUT_DATAFRAME):
         with suppress_stdout():
             file_pdf = downloadPDF(id_licitacao, id_arquivo)
         if file_pdf != None:
-            p = Path(file_pdf)
-            if p.suffix.find('.doc')!=-1:
-                file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS)
-                os.remove(p.name)
+            pathPdfFile = Path(file_pdf)
+            if pathPdfFile.suffix.find('.doc')!=-1:
+                file_pdf = docAndDocxToPdf(pathPdfFile.name, DIR_ARQUIVOS)
+                os.remove(pathPdfFile.name)
                 os.chdir(BASE_DIR)
-            PDFtoText(file_pdf, id_licitacao, id_arquivo)
+            if file_pdf != False:
+                PDFtoText(file_pdf, id_licitacao, id_arquivo)
+            else:
+                FAILED_CONVERSION.append('{}-{}\n'.format(id_licitacao, id_arquivo))
         else:
-            FAILED_FILES.append('{}-{}\n'.format(id_licitacao, id_arquivo))
+            FAILED_DOWNLOAD.append('{}-{}\n'.format(id_licitacao, id_arquivo))
         progress.update(1)
-    saveFile(FAILED_FILES, 'FailedFiles.txt')
+    saveFile(FAILED_DOWNLOAD, 'failedDownload.txt')
+    saveFile(FAILED_CONVERSION, 'failedConversion.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
 if __name__ == "__main__":
