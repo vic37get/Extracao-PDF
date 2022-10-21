@@ -78,17 +78,18 @@ def ExtractText():
     saveFile(FAILED_CONVERSION, 'docAndDocxFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
-    def saveFiles():
-        progress = tqdm(total=len(INPUT_DATAFRAME))
-        for file in INPUT_DATAFRAME.index:
-            id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
-            id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
-            with suppress_stdout():
-                file_pdf = downloadFile(id_licitacao, id_arquivo,OUT_DIR)
-            progress.update(1)
-            removeArquivosPDF(DIR_ARQUIVOS)
+def saveFiles():
+    progress = tqdm(total=len(INPUT_DATAFRAME))
+    for file in INPUT_DATAFRAME.index:
+        id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
+        id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
+        with suppress_stdout():
+            file_pdf = downloadFile(id_licitacao, id_arquivo,OUT_DIR)
+        progress.update(1)
+        removeArquivosPDF(DIR_ARQUIVOS)
         
 
 if __name__ == "__main__":
     #ExtractText()
     saveFiles()
+    #PDFtoText('sampleFile.pdf', '111', '222')
