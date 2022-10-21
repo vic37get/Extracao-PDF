@@ -5,3 +5,5 @@
 .vscode
 *.doc
 *.docx
+*.txt
+*.md
