@@ -36,6 +36,7 @@ def classifier(pdf_file):
                 res.append(1)
             else:
                 res.append(-1)
+        f.close()
         return res
 
 def classifier_pdf(file_path):
@@ -65,20 +66,24 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-OUTPUT_TYPE_DATAFRAME = './tipos.csv'
-def saveData(save=True):
+OUTPUT_TYPE_DATAFRAME = './tipos_threads.csv'
+def saveData(sem,current_threads,total_threads,save=True):
     result = []
     err = []
-    progress = tqdm(total=len(INPUT_DATAFRAME))
     pwd = os.path.abspath('.')
+    range_exe = round(current_threads*(len(INPUT_DATAFRAME)/total_threads))
+    ant_range_exe = round((current_threads-1)*(len(INPUT_DATAFRAME)/total_threads))
+    progress = tqdm(total=(range_exe-ant_range_exe))
     for file in INPUT_DATAFRAME.index:
+        if not(file>=ant_range_exe and file<= range_exe):
+            continue
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         progress.update(1)
         with suppress_stdout():
             file_pdf = downloadPDF(id_licitacao, id_arquivo)
-        if file_pdf == None:
-            continue
+            if file_pdf == None:
+                continue
         p = Path(file_pdf)
         if p.suffix.find('.doc')!=-1:
             file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS)
@@ -102,10 +107,24 @@ def saveData(save=True):
             err.append(file_pdf)
         removeArquivosPDF(DIR_ARQUIVOS)
     if save:
-        df = pd.DataFrame(result)
-        df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
+        sem.acquire(blocking=True)
+        try:
+            df = pd.read_csv(OUTPUT_TYPE_DATAFRAME,sep=',')
+            _df_aux = pd.DataFrame(result)
+            df = pd.concat([df,_df_aux],axis=1)
+        except:
+            df = pd.DataFrame(result)
+            df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
         df.to_csv(OUTPUT_TYPE_DATAFRAME,index=False,sep=',')
+        sem.release()
     with open('err.txt','w',encoding='utf-8') as f:
         f.write(err)
-            
-saveData()
+
+
+from threading import Thread,Semaphore
+def main(n_threads):
+    sem = Semaphore(1)
+    for i in range(1,n_threads+1):
+        _th = Thread(target=saveData,name=str(i), args=[sem,i,n_threads,True])
+        _th.start()         
+main(15)
