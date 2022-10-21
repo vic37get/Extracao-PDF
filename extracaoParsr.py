@@ -23,8 +23,8 @@ def getExtension(tipo):
             return ext[0]
 
 def downloadPDF(id_licitacao, id_arquivo, OUT_DIR):
-    URL = 'http://sistemas.tce.pi.gov.br/muralic/api/licitacoes/{}/arquivos/{}'.format(id_licitacao, id_arquivo)
     try:
+        URL = 'http://sistemas.tce.pi.gov.br/muralic/api/licitacoes/{}/arquivos/{}'.format(id_licitacao, id_arquivo)
         file = wget.download(URL, "{}/{}-{}".format(DIR_ARQUIVOS, id_licitacao, id_arquivo))
         tipo = magic.from_file(file)
         os.rename(file, file+getExtension(tipo))
@@ -83,4 +83,11 @@ def ExtractText(INPUT_DATAFRAME):
 
 if __name__ == "__main__":
     #ExtractText(INPUT_DATAFRAME)
-    downloadPDF
+    progress = tqdm(total=len(INPUT_DATAFRAME))
+    for file in INPUT_DATAFRAME.index:
+        id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
+        id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
+        with suppress_stdout():
+            file_pdf = downloadPDF(id_licitacao, id_arquivo,OUT_DIR)
+        progress.update(1)
+        removeArquivosPDF(DIR_ARQUIVOS)

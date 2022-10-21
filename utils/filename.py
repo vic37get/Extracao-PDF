@@ -14,6 +14,7 @@ rar=re.compile(r'RAR archive data')
 rtf=re.compile(r'Rich Text Format')
 tif=re.compile(r'TIFF image data')
 zipe=re.compile(r'Zip archive data')
+empty=re.compile(r'empty')
 
 lista=[(".txt",txt),(".doc",doc),
        (".java",java),(".html",html),
@@ -21,4 +22,5 @@ lista=[(".txt",txt),(".doc",doc),
        (".xps",xps),(".docx",docx),
        (".pdf",pdf),(".png",png),
        (".rar",rar),(".rtf",rtf),
-       (".tif",tif),(".zip",zipe)]
+       (".tif",tif),(".zip",zipe),('.empty',empty)
+       ]
