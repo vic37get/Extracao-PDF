@@ -1,17 +1,12 @@
-from markdown import markdown
-from bs4 import BeautifulSoup
-import re
+import repackage
+repackage.up()
+from utils.regularExpressions import *
 
 def markDownToText(text_markdown):
-    html = markdown(text_markdown)
-    # remove code snippets
-    html = re.sub(r'<pre>(.*?)</pre>', ' ', html)
-    html = re.sub(r'<code>(.*?)</code >', ' ', html)
-    # extract text
-    soup = BeautifulSoup(html, "html.parser")
-    text = ''.join(soup.findAll(text=True))
-    print(text)
-    return text
+    text_markdown = removeTables(text_markdown)
+    text_markdown = removeAsterisk(text_markdown)
+    text_markdown = removeBreakPage(text_markdown)
+    return text_markdown
 
 def readMarkDownFile(fileMarkDown):
     with open(fileMarkDown, 'r') as file:
@@ -22,6 +17,7 @@ def saveMarkdownToText(dataText, fileName):
     with open(fileName, 'w') as file:
         file.write(dataText)
 
+#-----------------
 mkfile = readMarkDownFile('manipulations/sampleFile.md')
 data = markDownToText(mkfile)
 saveMarkdownToText(data, 'exemplomd.txt')
