@@ -7,3 +7,4 @@ tqdm==4.64.1
 Markdown==3.4.1
 beautifulsoup4==4.11.1
 PyMuPDF==1.20.2
+repackage
