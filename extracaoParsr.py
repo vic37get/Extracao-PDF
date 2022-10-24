@@ -14,6 +14,8 @@ BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
 #BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 OUT_DIR = '/var/projetos/arquivos'
+#DIR_PDFS = '/var/projetos/arquivos/arquivos_.pdf'
+DIR_PDFS = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 
 def getExtension(tipo):
@@ -84,12 +86,25 @@ def saveFiles():
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         with suppress_stdout():
-            file_pdf = downloadFile(id_licitacao, id_arquivo,OUT_DIR)
+            downloadFile(id_licitacao, id_arquivo,OUT_DIR)
         progress.update(1)
         removeArquivosPDF(DIR_ARQUIVOS)
-        
+
+def ExtractTextFromDIR(DIR):
+    arquivos = os.listdir(DIR)
+    progress = tqdm(total=len(arquivos))
+    for index, arquivo in enumerate(arquivos):
+        if index == 20:
+            break
+        filename = arquivo.split('-')
+        id_licitacao = filename[0]
+        id_arquivo = filename[1].split('.')[0]
+        dir_arquivo = os.path.join(DIR, arquivo)
+        PDFtoText(dir_arquivo, id_licitacao, id_arquivo)
+        progress.update(1)   
 
 if __name__ == "__main__":
+    ExtractTextFromDIR(DIR_PDFS)
     #ExtractText()
-    saveFiles()
-    #PDFtoText('sampleFile.pdf', '111', '222')
+    #saveFiles()
+    #PDFtoText('100000-49197.pdf', '111', '222')
