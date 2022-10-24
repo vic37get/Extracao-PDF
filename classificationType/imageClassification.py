@@ -2,8 +2,12 @@ import fitz
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import re
 
-from extracts.extracaoParsr import INPUT_DATAFRAME,DIR_ARQUIVOS,downloadPDF,removeArquivosPDF
+import repackage
+repackage.up()
+from extracaoParsr import removeArquivosPDF
+
 from manipulations.manipulationDados import getIdArquivo,getIdLicitacao
 from tqdm import tqdm
 from convertDocAndDocx import docAndDocxToPdf
@@ -15,11 +19,13 @@ def classifier(pdf_file):
         for page in pdf:
             image_area = 0.0
             text_area = 0.0
+            print(page.get_image(transform=True))
             for b in page.get_text("blocks"):
+                print(b,'<image:' in b[4])
                 if '<image:' in b[4]:
                     #print(b)
                     r = fitz.Rect(b[:4])
-                    #print(r)
+                    print(abs(r))
                     image_area = image_area + abs(r)
                 else:
                     r = fitz.Rect(b[:4])
@@ -28,8 +34,10 @@ def classifier(pdf_file):
             if(total_area==0):
                 res.append(-2)
                 continue
+            print(text_area,image_area)
             image_percent = image_area/total_area*100
             text_percent = text_area/total_area*100
+            print(text_percent,image_percent)
             if(image_percent>75):
                 res.append(0)
             elif(text_percent>75):
@@ -43,6 +51,7 @@ def classifier_pdf(file_path):
     classifier_result = classifier(file_path)
     classifier_result =  np.asarray(classifier_result)
     counts = np.unique(classifier_result,return_counts=True)
+    print(counts)
     total = np.sum(counts[1])
     ind = 1
     entry = False
@@ -66,65 +75,51 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-OUTPUT_TYPE_DATAFRAME = './tipos_threads.csv'
-def saveData(sem,current_threads,total_threads,save=True):
+OUTPUT_TYPE_DATAFRAME = './tipos.csv'
+def saveData(file_pdf,save=True):
     result = []
     err = []
     pwd = os.path.abspath('.')
-    range_exe = round(current_threads*(len(INPUT_DATAFRAME)/total_threads))
-    ant_range_exe = round((current_threads-1)*(len(INPUT_DATAFRAME)/total_threads))
-    progress = tqdm(total=(range_exe-ant_range_exe))
-    for file in INPUT_DATAFRAME.index:
-        if not(file>=ant_range_exe and file<= range_exe):
-            continue
-        id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
-        id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
+    arqs = os.listdir(file_pdf)
+    progress = tqdm(total=(len(arqs)))
+    count = 0
+    arqs = ['386221-416852.pdf']
+    for i in arqs:
+        count += 1
+        if(count >500):
+            break
+        p = Path(file_pdf).joinpath(i)
+        file_pdf_full = p.__str__()
+        id_licitacao,id_arquivo = re.sub(re.compile('\..*'),'',i).split('-')
         progress.update(1)
-        with suppress_stdout():
-            file_pdf = downloadPDF(id_licitacao, id_arquivo)
-            if file_pdf == None:
-                continue
-        p = Path(file_pdf)
-        if p.suffix.find('.doc')!=-1:
-            file_pdf = docAndDocxToPdf(p.name, DIR_ARQUIVOS)
-            os.remove(p.name)
-            os.chdir(pwd)
-        try:
-            type_pdf = classifier_pdf(file_pdf)
-            if(type_pdf==0):
-                result.append([id_licitacao,id_arquivo,'image'])
-                ...
-            if(type_pdf==1):
-                result.append([id_licitacao,id_arquivo,'text'])
-                ...
-            if(type_pdf==-1):
-                result.append([id_licitacao,id_arquivo,'half'])
-                ...
-            if(type_pdf==-2):
-                result.append([id_licitacao,id_arquivo,'empty'])
-                ...
-        except:
-            err.append(file_pdf)
-        removeArquivosPDF(DIR_ARQUIVOS)
+        '''try:'''
+        type_pdf = classifier_pdf(file_pdf_full)
+        if(type_pdf==0):
+            result.append([id_licitacao,id_arquivo,'image'])
+            ...
+        if(type_pdf==1):
+            result.append([id_licitacao,id_arquivo,'text'])
+            ...
+        if(type_pdf==-1):
+            result.append([id_licitacao,id_arquivo,'half'])
+            ...
+        if(type_pdf==-2):
+            result.append([id_licitacao,id_arquivo,'empty'])
+            ...
+        '''except:
+            err.append(file_pdf_full+'\n')'''
     if save:
-        sem.acquire(blocking=True)
-        try:
-            df = pd.read_csv(OUTPUT_TYPE_DATAFRAME,sep=',')
-            _df_aux = pd.DataFrame(result)
-            df = pd.concat([df,_df_aux],axis=1)
-        except:
-            df = pd.DataFrame(result)
-            df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
+        df = pd.read_csv(OUTPUT_TYPE_DATAFRAME,sep=',')
+        df = pd.DataFrame(result)
+        df.columns = ['ID-LICITACAO','ID-ARQUIVO','TIPO']
         df.to_csv(OUTPUT_TYPE_DATAFRAME,index=False,sep=',')
-        sem.release()
     with open('err.txt','w',encoding='utf-8') as f:
-        f.write(err)
+        f.writelines(err)
 
-
-from threading import Thread,Semaphore
-def main(n_threads):
-    sem = Semaphore(1)
-    for i in range(1,n_threads+1):
-        _th = Thread(target=saveData,name=str(i), args=[sem,i,n_threads,True])
-        _th.start()         
-main(15)
+import os
+if __name__ == '__main__':    
+    OUTPUT_PDF = r'/var/projetos/arquivos/arquivos_.pdf/' 
+    OUTPUT_PDF_CONV = r'/var/projetos/arquivos/arquivos_.doc/'
+    #main(15)
+    saveData(OUTPUT_PDF)
+    ...
