@@ -106,7 +106,9 @@ def extractTextFromDIR(DIR, raiz):
     progress = tqdm(total=len(arquivos))
     list_files = []
     for index, arquivo in enumerate(arquivos):
-        if index %15 != 0 or index == 0:
+        #if index == 2:
+            #break
+        if index %30 != 0 or index == 0:
             filename = getFilename(arquivo)
             list_files.append(filename)
             id_licitacao, id_arquivo = getIds(filename)
@@ -121,7 +123,7 @@ def extractTextFromDIR(DIR, raiz):
                     for folder in os.listdir(raiz):
                         if folder.find(file) != -1 and searchMarkDown(raiz, folder) == True:
                             countMd+=1
-                            if countMd >=14:
+                            if countMd >=15:
                                 created = True
                                 #-----------------
                                 filename = getFilename(arquivo)
