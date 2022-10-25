@@ -11,6 +11,7 @@ from conversions.convertDocAndDocx import docAndDocxToPdf
 import shutil
 
 BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
+DIR_PARSR = '/var/projetos/parsr'
 #BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 OUT_DIR = '/var/projetos/arquivos'
@@ -38,18 +39,18 @@ def downloadFile(id_licitacao, id_arquivo, OUT_DIR):
     except:
         return None
 
-def PDFtoText(arquivoPDF, id_licitacao, id_arquivo):
+def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
     parsr = conect()
     parsr.send_document(
         file_path=str(arquivoPDF),
         config_path='./defaultConfig.json',
         document_name='{}-{}'.format(id_licitacao, id_arquivo),
         wait_till_finished=False,
-        save_request_id=True,
+        save_request_id=False,
     )
     return parsr
 
-def ExtractText():
+def extractText():
     FAILED_DOWNLOAD, FAILED_CONVERSION, DOC = [],[],[]
     progress = tqdm(total=len(INPUT_DATAFRAME))
     for file in INPUT_DATAFRAME.index:
@@ -61,7 +62,7 @@ def ExtractText():
             file_pdf = downloadFile(id_licitacao, id_arquivo)
         file_pdf = downloadFile(id_licitacao, id_arquivo, OUT_DIR)
         if file_pdf != None:
-            PDFtoText(file_pdf, id_licitacao, id_arquivo)
+            pdfToText(file_pdf, id_licitacao, id_arquivo)
             pathPdfFile = Path(file_pdf)
             if pathPdfFile.suffix.find('.doc')!=-1:
                 DOC.append('{}-{}\n'.format(id_licitacao, id_arquivo))
@@ -69,7 +70,7 @@ def ExtractText():
                 os.remove(pathPdfFile.name)
                 os.chdir(BASE_DIR)
             if file_pdf != False:
-                PDFtoText(file_pdf, id_licitacao, id_arquivo)
+                pdfToText(file_pdf, id_licitacao, id_arquivo)
             else:
                 FAILED_CONVERSION.append('{}-{}\n'.format(id_licitacao, id_arquivo))
         else:
@@ -90,21 +91,56 @@ def saveFiles():
         progress.update(1)
         removeArquivosPDF(DIR_ARQUIVOS)
 
-def ExtractTextFromDIR(DIR):
+def getFilename(arquivo):
+    filename = arquivo.split('.')[0]
+    return filename
+
+def getIds(filename):
+    file = filename.split('-')       
+    id_licitacao = file[0]
+    id_arquivo = file[1]
+    return id_licitacao, id_arquivo
+
+def extractTextFromDIR(DIR, raiz):
     arquivos = os.listdir(DIR)
     progress = tqdm(total=len(arquivos))
+    list_files = []
     for index, arquivo in enumerate(arquivos):
-        if index == 20:
-            break
-        filename = arquivo.split('-')
-        id_licitacao = filename[0]
-        id_arquivo = filename[1].split('.')[0]
-        dir_arquivo = os.path.join(DIR, arquivo)
-        PDFtoText(dir_arquivo, id_licitacao, id_arquivo)
-        progress.update(1)   
+        if index %15 != 0 or index == 0:
+            filename = getFilename(arquivo)
+            list_files.append(filename)
+            id_licitacao, id_arquivo = getIds(filename)
+            dir_arquivo = os.path.join(DIR, arquivo)
+            pdfToText(dir_arquivo, id_licitacao, id_arquivo)
+
+        else:
+            created = False
+            while(created == False):
+                countMd = 0
+                for file in list_files:
+                    for folder in os.listdir(raiz):
+                        if folder.find(file) != -1 and searchMarkDown(raiz, folder) == True:
+                            countMd+=1
+                            if countMd >=14:
+                                created = True
+                                #-----------------
+                                filename = getFilename(arquivo)
+                                id_licitacao, id_arquivo = getIds(filename)
+                                dir_arquivo = os.path.join(DIR, arquivo)
+                                pdfToText(dir_arquivo, id_licitacao, id_arquivo)
+                                list_files = []
+                        else:
+                            continue
+        progress.update(1)
+
+def searchMarkDown(raiz, folder):
+    for j in os.listdir(os.path.join(raiz, folder)):
+        if j.find('.md') != -1:
+            return True
+    return False
 
 if __name__ == "__main__":
-    ExtractTextFromDIR(DIR_PDFS)
+    extractTextFromDIR(DIR_PDFS, DIR_PARSR)
     #ExtractText()
     #saveFiles()
-    #PDFtoText('100000-49197.pdf', '111', '222')
+    #PDFtoText('386221-416852.pdf', '111', '222')
