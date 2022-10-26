@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from contextlib import contextmanager
 import sys
+import re
 
 def readCsv(arquivo):
     dados = pd.read_csv(arquivo, sep=',', encoding='utf-8')
@@ -13,9 +14,24 @@ def getIdArquivo(df, indice):
 def getIdLicitacao(df, indice):
     return str(int(df.iloc[indice].ID_LICITACAO))
 
+def getExtension(tipo, filename_list):
+    for extension in filename_list:
+        if re.search(extension[1],tipo):
+            return extension[0]
+
+def getFilename(arquivo):
+    filename = arquivo.split('.')[0]
+    return filename
+
+def getIds(filename):
+    file = filename.split('-')       
+    id_licitacao = file[0]
+    id_arquivo = file[1]
+    return id_licitacao, id_arquivo
+
 def removeArquivosPDF(diretorio):
     for arquivo in os.listdir(diretorio):
-        if(arquivo.find('.git')) == -1:
+        if(arquivo.find('.pdf')) == -1:
             os.remove(os.path.join(diretorio, arquivo))
 
 def saveFile(data, filename):

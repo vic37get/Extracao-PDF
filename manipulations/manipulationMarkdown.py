@@ -3,6 +3,7 @@ repackage.up()
 from utils.regularExpressions import *
 from bs4 import BeautifulSoup
 from markdown import markdown
+import os
 
 def markDownToTextBs(text_markdown):
     text_markdown = markdown(text_markdown)
@@ -33,6 +34,12 @@ def readMarkDownFileMK(fileMarkDown):
         release_note = file.read()
         description = bytes(release_note, 'utf-8')
     return description.decode("utf-8")
+
+def searchMarkDown(raiz, folder):
+    for j in os.listdir(os.path.join(raiz, folder)):
+        if j.find('.md') != -1:
+            return True
+    return False
 
 #-----------------
 
