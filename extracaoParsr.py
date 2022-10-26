@@ -1,43 +1,20 @@
 from utils.conexao import conect
-from manipulations.manipulationDados import readCsv, getIdArquivo, getIdLicitacao, removeArquivosPDF, saveFile, suppress_stdout, createFolder
-import wget
-import magic
-from utils.filename import lista as lista_filename
-import re
+from manipulations.manipulationFile import *
+from manipulations.manipulationMarkdown import *
+from conversions.convertDocAndDocx import *
+from downloadFile import *
 import os
 from pathlib import Path
 from tqdm import tqdm
-from conversions.convertDocAndDocx import docAndDocxToPdf
-import shutil
 
 BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
 DIR_PARSR = '/var/projetos/parsr'
 #BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 OUT_DIR = '/var/projetos/arquivos'
-#DIR_PDFS = '/var/projetos/arquivos/arquivos_.pdf'
-DIR_PDFS = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
+#FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
+FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
-
-def getExtension(tipo):
-    for ext in lista_filename:
-        if re.search(ext[1],tipo):
-            return ext[0]
-
-def downloadFile(id_licitacao, id_arquivo, OUT_DIR):
-    try:
-        URL = 'http://sistemas.tce.pi.gov.br/muralic/api/licitacoes/{}/arquivos/{}'.format(id_licitacao, id_arquivo)
-        file = wget.download(URL, "{}/{}-{}".format(DIR_ARQUIVOS, id_licitacao, id_arquivo))
-        tipo = magic.from_file(file)
-        os.rename(file, file+getExtension(tipo))
-        file = file+getExtension(tipo)
-        NEW_DIR = Path(OUT_DIR).joinpath(createFolder('arquivos_'+getExtension(tipo), OUT_DIR))
-        filename = Path(file).name
-        NEW_DIR = NEW_DIR.joinpath(filename)
-        shutil.move(file, NEW_DIR)
-        return file
-    except:
-        return None
 
 def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
     parsr = conect()
@@ -50,17 +27,16 @@ def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
     )
     return parsr
 
-def extractText():
+def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
     FAILED_DOWNLOAD, FAILED_CONVERSION, DOC = [],[],[]
     progress = tqdm(total=len(INPUT_DATAFRAME))
     for file in INPUT_DATAFRAME.index:
-        if file == 100:
-            break
+        #if file == 100:
+            #break
         id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
         id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
         with suppress_stdout():
-            file_pdf = downloadFile(id_licitacao, id_arquivo)
-        file_pdf = downloadFile(id_licitacao, id_arquivo, OUT_DIR)
+            file_pdf = downloadFile(id_licitacao, id_arquivo, OUT_DIR)
         if file_pdf != None:
             pdfToText(file_pdf, id_licitacao, id_arquivo)
             pathPdfFile = Path(file_pdf)
@@ -81,68 +57,42 @@ def extractText():
     saveFile(FAILED_CONVERSION, 'docAndDocxFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
 
-def saveFiles():
-    progress = tqdm(total=len(INPUT_DATAFRAME))
-    for file in INPUT_DATAFRAME.index:
-        id_arquivo = getIdArquivo(INPUT_DATAFRAME, file)
-        id_licitacao = getIdLicitacao(INPUT_DATAFRAME, file)
-        with suppress_stdout():
-            downloadFile(id_licitacao, id_arquivo,OUT_DIR)
-        progress.update(1)
-        removeArquivosPDF(DIR_ARQUIVOS)
-
-def getFilename(arquivo):
-    filename = arquivo.split('.')[0]
-    return filename
-
-def getIds(filename):
-    file = filename.split('-')       
-    id_licitacao = file[0]
-    id_arquivo = file[1]
-    return id_licitacao, id_arquivo
-
-def extractTextFromDIR(DIR, raiz):
-    arquivos = os.listdir(DIR)
-    progress = tqdm(total=len(arquivos))
+def extractTextFromDIR(FILES_DIR, DIR_PARSR):
+    files = os.listdir(FILES_DIR)
+    progress = tqdm(total=len(files))
     list_files = []
-    for index, arquivo in enumerate(arquivos):
+    for index, file in enumerate(files):
         #if index == 2:
             #break
         if index %30 != 0 or index == 0:
-            filename = getFilename(arquivo)
+            filename = getFilename(file)
             list_files.append(filename)
             id_licitacao, id_arquivo = getIds(filename)
-            dir_arquivo = os.path.join(DIR, arquivo)
+            dir_arquivo = os.path.join(FILES_DIR, file)
             pdfToText(dir_arquivo, id_licitacao, id_arquivo)
 
         else:
             created = False
             while(created == False):
                 countMd = 0
-                for file in list_files:
-                    for folder in os.listdir(raiz):
-                        if folder.find(file) != -1 and searchMarkDown(raiz, folder) == True:
+                for file_item in list_files:
+                    for folder in os.listdir(DIR_PARSR):
+                        if folder.find(file_item) != -1 and searchMarkDown(DIR_PARSR, folder) == True:
                             countMd+=1
                             if countMd >=15:
                                 created = True
                                 #-----------------
-                                filename = getFilename(arquivo)
+                                filename = getFilename(file)
                                 id_licitacao, id_arquivo = getIds(filename)
-                                dir_arquivo = os.path.join(DIR, arquivo)
+                                dir_arquivo = os.path.join(FILES_DIR, file)
                                 pdfToText(dir_arquivo, id_licitacao, id_arquivo)
                                 list_files = []
                         else:
                             continue
         progress.update(1)
-
-def searchMarkDown(raiz, folder):
-    for j in os.listdir(os.path.join(raiz, folder)):
-        if j.find('.md') != -1:
-            return True
-    return False
-
+    
 if __name__ == "__main__":
-    extractTextFromDIR(DIR_PDFS, DIR_PARSR)
+    extractTextFromDIR(FILES_DIR, DIR_PARSR)
     #ExtractText()
-    #saveFiles()
+    #downloadFiles()
     #PDFtoText('386221-416852.pdf', '111', '222')
