@@ -3,17 +3,18 @@ from manipulations.manipulationFile import *
 from manipulations.manipulationMarkdown import *
 from conversions.convertDocAndDocx import *
 from downloadFile import *
+from directory import *
 import os
 from pathlib import Path
 from tqdm import tqdm
 
-BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
+#BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
 DIR_PARSR = '/var/projetos/parsr'
-#BASE_DIR = '/home/victor.silva/Extracao-PDF'
+BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 OUT_DIR = '/var/projetos/arquivos'
-#FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
-FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
+FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
+#FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 
 def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
@@ -58,8 +59,9 @@ def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
     removeArquivosPDF(DIR_ARQUIVOS)
 
 def extractTextFromDIR(FILES_DIR, DIR_PARSR):
-    files = os.listdir(FILES_DIR)
-    progress = tqdm(total=len(files))
+    files = getUnprocessedFiles(FILES_DIR, DIR_PARSR)
+    #files = os.listdir(FILES_DIR)
+    progress = tqdm(total=len(files), desc='Executando o parsr...')
     list_files = []
     for index, file in enumerate(files):
         #if index == 2:
