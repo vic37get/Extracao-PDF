@@ -42,7 +42,7 @@ def getUnprocessedFiles(FILES_DIR, DIR_PARSR):
             if folder.find(filename) != -1:
                 file_exist = True
         if file_exist == False:
-            candidate_files.append(os.path.join(FILES_DIR, file))
+            candidate_files.append(file)
         progress.update(1)
     return candidate_files
 
