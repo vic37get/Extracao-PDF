@@ -1,9 +1,9 @@
 OUT_DIR = '/var/projetos/arquivos/'
-DIR_PARSR = '/var/projetos/parsr'
+DIR_PARSR = '/var/arquivosPDF'
 #DIR_PARSR = './teste'
-DEST_DIR = '/var/projetos/arquivos_md'
+DEST_DIR = '/var/arquivos_md'
 #DEST_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
-FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
+FILES_DIR = '/home/weslley/arquivosPDF'
 
 from utils.filename import lista as list_ext
 import os
@@ -18,7 +18,7 @@ def createTreeDir(OUT_DIR, list_ext):
 
 def moveMarkdownFiles(DIR_PARSR, DEST_DIR):
     folders = os.listdir(DIR_PARSR)
-    progress = tqdm(total=len(folders), desc='Movendo arquivos Markdown...')
+    progress = tqdm(total=len(folders), desc='Movendo arquivos Markdown')
     for folder in folders:
         CURRENT_FOLDER = os.path.join(DIR_PARSR, folder)
         for file in os.listdir(CURRENT_FOLDER):
@@ -34,7 +34,7 @@ def moveMarkdownFiles(DIR_PARSR, DEST_DIR):
 def getUnprocessedFiles(FILES_DIR, DIR_PARSR):
     candidate_files = []
     files = os.listdir(FILES_DIR)
-    progress = tqdm(total=len(files), desc='Obtendo arquivos não processados...')
+    progress = tqdm(total=len(files), desc='Obtendo arquivos não processados')
     for file in files:
         file_exist = False
         filename = file.split('.')[0]

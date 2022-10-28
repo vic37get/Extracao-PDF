@@ -9,11 +9,11 @@ from pathlib import Path
 from tqdm import tqdm
 
 #BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
-DIR_PARSR = '/var/projetos/parsr'
-BASE_DIR = '/home/victor.silva/Extracao-PDF'
+DIR_PARSR = '/var/arquivosPDF'
+BASE_DIR = '/home/victor/Extracao-PDF'
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
-OUT_DIR = '/var/projetos/arquivos'
-FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
+OUT_DIR = '/var/arquivos'
+FILES_DIR = '/home/weslley/arquivosPDF'
 #FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 
@@ -61,7 +61,7 @@ def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
 def extractTextFromDIR(FILES_DIR, DIR_PARSR):
     files = getUnprocessedFiles(FILES_DIR, DIR_PARSR)
     #files = os.listdir(FILES_DIR)
-    progress = tqdm(total=len(files), desc='Executando o parsr...')
+    progress = tqdm(total=len(files), desc='Executando o parsr')
     list_files = []
     for index, file in enumerate(files):
         #if index == 2:
