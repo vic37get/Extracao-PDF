@@ -9,13 +9,16 @@ from pathlib import Path
 from tqdm import tqdm
 
 #BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
-DIR_PARSR = '/var/arquivosPDF'
-BASE_DIR = '/home/victor/Extracao-PDF'
-DIR_ARQUIVOS = 'arquivos/arquivosPDF'
-OUT_DIR = '/var/arquivos'
-FILES_DIR = '/home/weslley/arquivosPDF'
-#FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
-INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
+#DIR_PARSR = '/var/arquivosPDF'
+
+DIR_PARSR = 'C:\\Users\\victor.silva\\Documents\\Projetos\\Extracao-PDF\\OUTPUT_PARSR'
+#BASE_DIR = '/home/victor/Extracao-PDF'
+#DIR_ARQUIVOS = 'arquivos/arquivosPDF'
+#OUT_DIR = '/var/arquivos'
+#FILES_DIR = '/home/weslley/arquivosPDF'
+
+FILES_DIR = 'C:\\Users\\victor.silva\\Documents\\Projetos\\Extracao-PDF\\OUTPUT_DIR'
+#INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 
 def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
     parsr = conect()
