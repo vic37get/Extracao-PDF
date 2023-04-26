@@ -9,12 +9,13 @@ opt = parser.parse_args()
 def extract_all():
     input = Path(opt.input)
     for i,p in enumerate(input.glob("*.zip")):
+        print(i)
         extract_dir = Path(opt.output).joinpath(p.stem)
         if not os.path.exists(extract_dir):
             os.mkdir(extract_dir)
             shutil.unpack_archive(p,extract_dir)
-        if i > 30:
-            break
+        #if i > 30:
+        #    break
 
 registro = dict()
 def findEdital(input=Path(opt.output),registro=dict()):
@@ -58,6 +59,6 @@ def move_files(src_dir, dst_dir):
                 # Arquivo já existe no destino, ignorar
                 pass
 
-src_dir = 'INPUT_DIR'
-dst_dir = 'OUTPUT_DIR'
-move_files(src_dir, dst_dir)
+#src_dir = '/var/projetos/arquivosZip'
+#dst_dir = '/var/projetos/arquivos'
+#move_files(src_dir, dst_dir)

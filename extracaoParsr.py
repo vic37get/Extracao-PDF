@@ -9,28 +9,29 @@ from pathlib import Path
 from tqdm import tqdm
 
 #BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
-#DIR_PARSR = '/var/arquivosPDF'
-
-DIR_PARSR = 'C:\\Users\\victor.silva\\Documents\\Projetos\\Extracao-PDF\\OUTPUT_PARSR'
-#BASE_DIR = '/home/victor/Extracao-PDF'
+#DIR_PARSR = '/var/projetos/parsr'
+#BASE_DIR = '/home/victor.silva/Extracao-PDF'
+DIR_PARSR = '/var/projetos/comprasnet_md'
+BASE_DIR = '/home/victor/Extracao-PDF'
 #DIR_ARQUIVOS = 'arquivos/arquivosPDF'
+#OUT_DIR = '/var/projetos/arquivos'
+#FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
 #OUT_DIR = '/var/arquivos'
-#FILES_DIR = '/home/weslley/arquivosPDF'
-
-FILES_DIR = 'C:\\Users\\victor.silva\\Documents\\Projetos\\Extracao-PDF\\OUTPUT_DIR'
+FILES_DIR = '/home/victor/Extracao-PDF/OUTPUT_DIR'
+#FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 #INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 
-def pdfToText(arquivoPDF, id_licitacao, id_arquivo):
+def pdfToText(arquivoPDF, filename):
     parsr = conect()
+    print('conectou')
     parsr.send_document(
         file_path=str(arquivoPDF),
         config_path='./defaultConfig.json',
-        document_name='{}-{}'.format(id_licitacao, id_arquivo),
+        document_name='{}'.format(filename),
         wait_till_finished=False,
         save_request_id=False,
     )
     return parsr
-
 def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
     FAILED_DOWNLOAD, FAILED_CONVERSION, DOC = [],[],[]
     progress = tqdm(total=len(INPUT_DATAFRAME))
@@ -60,11 +61,11 @@ def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
     saveFile(FAILED_CONVERSION, 'failedConversion.txt')
     saveFile(FAILED_CONVERSION, 'docAndDocxFiles.txt')
     removeArquivosPDF(DIR_ARQUIVOS)
-
+    
 def extractTextFromDIR(FILES_DIR, DIR_PARSR):
     files = getUnprocessedFiles(FILES_DIR, DIR_PARSR)
     #files = os.listdir(FILES_DIR)
-    progress = tqdm(total=len(files), desc='Executando o parsr')
+    progress = tqdm(total=len(files), desc='Executando o parsr...')
     list_files = []
     for index, file in enumerate(files):
         #if index == 2:
@@ -72,11 +73,12 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
         if index %30 != 0 or index == 0:
             filename = getFilename(file)
             list_files.append(filename)
-            id_licitacao, id_arquivo = getIds(filename)
+            #id_licitacao, id_arquivo = getIds(filename)
             dir_arquivo = os.path.join(FILES_DIR, file)
-            pdfToText(dir_arquivo, id_licitacao, id_arquivo)
-
+            print('entrou no if')
+            pdfToText(dir_arquivo, filename)
         else:
+            print('foi no else')
             created = False
             while(created == False):
                 countMd = 0
@@ -88,9 +90,9 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
                                 created = True
                                 #-----------------
                                 filename = getFilename(file)
-                                id_licitacao, id_arquivo = getIds(filename)
+                                #id_licitacao, id_arquivo = getIds(filename)
                                 dir_arquivo = os.path.join(FILES_DIR, file)
-                                pdfToText(dir_arquivo, id_licitacao, id_arquivo)
+                                pdfToText(dir_arquivo, filename)
                                 list_files = []
                         else:
                             continue
