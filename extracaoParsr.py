@@ -1,29 +1,18 @@
 from utils.conexao import conect
-from manipulations.manipulationFile import *
-from manipulations.manipulationMarkdown import *
-from conversions.convertDocAndDocx import *
-from downloadFile import *
-from directory import *
+from manipulacao.manipulationFile import getIdArquivo, getIdLicitacao, suppress_stdout, saveFile, removeArquivosPDF, getFilename
+from manipulacao.manipulationMarkdown import searchMarkDown
+from conversoes.convertDocAndDocx import docAndDocxToPdf
+from downloadFile import downloadFile
+from directory import getUnprocessedFiles
 import os
 from pathlib import Path
 from tqdm import tqdm
 
-#BASE_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF'
-#DIR_PARSR = '/var/projetos/parsr'
-#BASE_DIR = '/home/victor.silva/Extracao-PDF'
 DIR_PARSR = '/var/projetos/comprasnet_md'
-BASE_DIR = '/home/victor/Extracao-PDF'
-#DIR_ARQUIVOS = 'arquivos/arquivosPDF'
-#OUT_DIR = '/var/projetos/arquivos'
-#FILES_DIR = '/var/projetos/arquivos/arquivos_.pdf'
-#OUT_DIR = '/var/arquivos'
-FILES_DIR = '/home/victor/Extracao-PDF/OUTPUT_DIR'
-#FILES_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
-#INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
+FILES_DIR = '/var/projetos/proParsr'
 
 def pdfToText(arquivoPDF, filename):
     parsr = conect()
-    print('conectou')
     parsr.send_document(
         file_path=str(arquivoPDF),
         config_path='./defaultConfig.json',
@@ -32,6 +21,7 @@ def pdfToText(arquivoPDF, filename):
         save_request_id=False,
     )
     return parsr
+
 def extractText(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS, BASE_DIR):
     FAILED_DOWNLOAD, FAILED_CONVERSION, DOC = [],[],[]
     progress = tqdm(total=len(INPUT_DATAFRAME))
@@ -75,10 +65,8 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
             list_files.append(filename)
             #id_licitacao, id_arquivo = getIds(filename)
             dir_arquivo = os.path.join(FILES_DIR, file)
-            print('entrou no if')
             pdfToText(dir_arquivo, filename)
         else:
-            print('foi no else')
             created = False
             while(created == False):
                 countMd = 0
@@ -100,6 +88,3 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
     
 if __name__ == "__main__":
     extractTextFromDIR(FILES_DIR, DIR_PARSR)
-    #ExtractText()
-    #downloadFiles()
-    #PDFtoText('386221-416852.pdf', '111', '222')

@@ -6,9 +6,21 @@ parser.add_argument('--input','-i',type=str, required=True)
 parser.add_argument('--output','-o',type=str, required=True)
 opt = parser.parse_args()
 
+def buscaDocumentos(input, extensao):
+    lista_arquivos = []
+    for arquivo in input.glob(extensao):
+        lista_arquivos.append(arquivo)
+    return lista_arquivos
+
 def extract_all():
     input = Path(opt.input)
-    for i,p in enumerate(input.glob("*.zip")):
+    arquivos_compactados = []
+    arquivos_zip = buscaDocumentos(input, '*.zip')
+    arquivos_rar = buscaDocumentos(input, '*.rar')
+    arquivos_compactados.extend(arquivos_zip)
+    arquivos_compactados.extend(arquivos_rar)
+    
+    for i,p in enumerate(arquivos_compactados):
         print(i)
         extract_dir = Path(opt.output).joinpath(p.stem)
         if not os.path.exists(extract_dir):
@@ -16,7 +28,7 @@ def extract_all():
             shutil.unpack_archive(p,extract_dir)
         #if i > 30:
         #    break
-
+    
 registro = dict()
 def findEdital(input=Path(opt.output),registro=dict()):
     for dir in input.glob('*'):
@@ -26,7 +38,7 @@ def findEdital(input=Path(opt.output),registro=dict()):
             lista_arquivos = sorted(lista_arquivos, key=os.path.getmtime)
             for files in lista_arquivos:
                 if os.path.isfile(files):
-                    if files.name.split('.')[1] == 'zip':
+                    if files.name.split('.')[1] == 'zip' or files.name.split('.')[1] == 'rar':
                         if not os.path.exists(files.parent.joinpath(files.stem)):
                             os.mkdir(dir.joinpath(files.stem))
                             shutil.unpack_archive(files,dir.joinpath(files.stem))
