@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+import time
 import shutil
 import re
 import pandas as pd
@@ -7,7 +7,9 @@ import zipfile
 import tarfile
 from tqdm.auto import tqdm
 
-#relacao, anexo
+def time_stamp():
+    return time.time() * 1000
+
 def extracao(SOURCE_DIR, DEST_DIR, DIR_PRO_PARSR):
     for arquivo in tqdm(os.listdir(SOURCE_DIR)):
         caminho_completo_arquivo = os.path.join(SOURCE_DIR, arquivo)
@@ -15,59 +17,67 @@ def extracao(SOURCE_DIR, DEST_DIR, DIR_PRO_PARSR):
             extrair_arquivo(caminho_completo_arquivo, DEST_DIR, DIR_PRO_PARSR, arquivo)
             
 def extrair_arquivo(arquivo, destino, dirProParsr, nomePai):
-    count = 0
     if zipfile.is_zipfile(arquivo):
-        with zipfile.ZipFile(arquivo, 'r') as zip_ref:
-            zip_ref.extractall(destino)
+        try:
+            with zipfile.ZipFile(arquivo, 'r') as zip_ref:
+                zip_ref.extractall(destino)
+        except:
+            print(f'{arquivo} não é um arquivo zip válido.')
+            return
         novo_nome = os.path.splitext(nomePai)[0]
         for filename in zip_ref.namelist():
             if arquivosValidos(filename):
                 caminho_completo = os.path.join(destino, filename)
                 extensao_arquivo = os.path.splitext(filename)[1]
-                caminho_novo = os.path.join(destino, '{}.{}'.format(novo_nome, extensao_arquivo))
-                os.rename(caminho_completo, caminho_novo)
+                caminho_novo = os.path.join(destino, '{}{}'.format(novo_nome, extensao_arquivo))
+                try:
+                    os.rename(caminho_completo, caminho_novo)
+                except FileNotFoundError:
+                    continue
                 try:
                     shutil.move(caminho_novo, dirProParsr)
                 except shutil.Error:
-                    count+=1
-                    caminho_novo = '{}_{}'.format(caminho_novo, count)
-                    shutil.move(caminho_novo, dirProParsr)
+                    nomeIncrementado = '{}_{}'.format(novo_nome, time_stamp())
+                    arquivoNaoDuplicado = os.path.join(destino, '{}{}'.format(nomeIncrementado, extensao_arquivo))
+                    os.rename(caminho_novo, arquivoNaoDuplicado)
+                    shutil.move(arquivoNaoDuplicado, dirProParsr)
                     
             caminho_completo_arquivo = os.path.join(destino, filename)
             if zipfile.is_zipfile(caminho_completo_arquivo):
                 extrair_arquivo(caminho_completo_arquivo, destino, dirProParsr, nomePai)
                 
     elif tarfile.is_tarfile(arquivo):
-        with tarfile.open(arquivo, 'r') as tar_ref:
-            tar_ref.extractall(destino)
+        count+=1
+        try:
+            with tarfile.open(arquivo, 'r') as tar_ref:
+                tar_ref.extractall(destino)
+        except:
+            print(f'{arquivo} não é um arquivo tar válido.')
+            return
         novo_nome = os.path.splitext(nomePai)[0]
         for filename in tar_ref.getnames():
+            count+=1
             if arquivosValidos(filename):
                 caminho_completo = os.path.join(destino, filename)
                 extensao_arquivo = os.path.splitext(filename)[1]
                 caminho_novo = os.path.join(destino, '{}.{}'.format(novo_nome, extensao_arquivo))
-                os.rename(caminho_completo, caminho_novo)
+                try:
+                    os.rename(caminho_completo, caminho_novo)
+                except FileNotFoundError:
+                    continue
                 try:
                     shutil.move(caminho_novo, dirProParsr)
                 except shutil.Error:
-                    count+=1
-                    caminho_novo = '{}_{}'.format(caminho_novo, count)
-                    shutil.move(caminho_novo, dirProParsr)
-            
+                    nomeIncrementado = '{}_{}'.format(novo_nome, time_stamp())
+                    arquivoNaoDuplicado = os.path.join(destino, '{}.{}'.format(nomeIncrementado, extensao_arquivo))
+                    os.rename(caminho_novo, arquivoNaoDuplicado)
+                    shutil.move(arquivoNaoDuplicado, dirProParsr)
+                    
             caminho_completo_arquivo = os.path.join(destino, filename)
-            if tarfile.is_tarfile(caminho_completo_arquivo):
+            if zipfile.is_zipfile(caminho_completo_arquivo):
                 extrair_arquivo(caminho_completo_arquivo, destino, dirProParsr, nomePai)
     else:
         print(f'{arquivo} não é um arquivo .zip ou .tar válido')
-
-def arquivoInfo(zips_usados, SOURCE_DIR):
-    now = datetime.now()
-    date_time = now.strftime("%d_%m_%Y")
-    diretorio = os.path.join(SOURCE_DIR, 'arquivosDeLog')
-    with open('{}/{}.txt'.format(diretorio, date_time), 'w') as f:
-        for arquivozip in zips_usados:
-            f.write('{}\n'.format(arquivozip))
-    f.close()
 
 def getNomeArquivo(listaNomes):
     cod_uags, cod_licitacoes = [], []
@@ -89,7 +99,7 @@ def geraDataFrameNomes(cod_uags, cod_licitacoes):
       
 def selecionaArquivos(SOURCE_DIR):
     lista_nomes = []
-    for indice, arquivo in enumerate(os.listdir(SOURCE_DIR)):
+    for arquivo in os.listdir(SOURCE_DIR):
         lista_nomes.append(arquivo)
     cod_uags, cod_licitacoes = getNomeArquivo(lista_nomes)
     geraDataFrameNomes(cod_uags, cod_licitacoes)
@@ -100,18 +110,15 @@ def processaArquivos(SOURCE_DIR, DEST_DIR, quantidade):
     for arquivo in tqdm(arquivosCandidatos.index):
         nome_uag = arquivosCandidatos['ID-UAG'][arquivo]
         nome_licitacao = arquivosCandidatos['ID-LICITACAO'][arquivo]
-        nome_completo = '{}_{}.zip'.format(nome_uag, nome_licitacao)
-        caminho_arquivo = os.path.join(SOURCE_DIR, nome_completo)
-        shutil.copy(caminho_arquivo, DEST_DIR)
-    #dfarquivos.loc[arquivosCandidatos.index, 'processados'] = 1
+        try:
+            nome_completo = '{}_{}.zip'.format(nome_uag, nome_licitacao)
+            caminho_arquivo = os.path.join(SOURCE_DIR, nome_completo)
+            shutil.copy(caminho_arquivo, DEST_DIR)
+        except:
+            pass
+    dfarquivos.loc[arquivosCandidatos.index, 'processados'] = 1
+    dfarquivos.to_csv('datasets/arquivosZip.csv', index=False, encoding='utf-8')
     
-def moveArquivosProcessados(diretorio_origem, diretorio_destino):
-    for diretorio_atual, subdiretorios, arquivos in os.walk(diretorio_origem):
-        for arquivo in arquivos:
-            caminho_origem = os.path.join(diretorio_atual, arquivo)
-            caminho_destino = os.path.join(diretorio_destino, arquivo)
-            shutil.move(caminho_origem, caminho_destino)
-
 def arquivosValidos(arquivo):
     extensoes_validas = ['.pdf', '.doc', '.docx', '.odt']
     relacao_itens = re.compile('Rela[cç][aã]o', re.IGNORECASE)
@@ -123,29 +130,12 @@ def arquivosValidos(arquivo):
             return True
     return False
     
-def moveArquivosValidos(SOURCE_DIR, DEST_DIR):
-    extensoes_validas = ['.pdf', '.doc', '.docx', '.odt']
-    relacao_itens = re.compile('Rela[cç][aã]o', re.IGNORECASE)
-    anexo = re.compile('anexo[s]?', re.IGNORECASE)
-    for diretorio_atual, subdiretorios, arquivos in os.walk(SOURCE_DIR):
-        for arquivo in arquivos:
-            if os.path.splitext(arquivo)[1] in extensoes_validas:
-                busca = re.search(relacao_itens, os.path.splitext(arquivo)[0])
-                if busca == None:
-                    #print(arquivo)
-                    caminho_origem = os.path.join(diretorio_atual, arquivo)
-                    caminho_destino = os.path.join(DEST_DIR, arquivo)
-                    shutil.move(caminho_origem, caminho_destino)
-
 def main():
-    processaArquivos(SOURCE_DIR, DEST_DIR, 100)
+    #processaArquivos(SOURCE_DIR, DEST_DIR, 50000)
+    extracao(DEST_DIR, EXTRACT_DIR, DIR_PRO_PARSR)
     
 SOURCE_DIR = '/var/comprasnet_arquivos'
 DEST_DIR = '/var/projetos/arquivos'
 EXTRACT_DIR = '/var/projetos/arquivosExtraidos'
 DIR_PRO_PARSR = '/var/projetos/arquivosProntos'
-extracao(DEST_DIR, EXTRACT_DIR, DIR_PRO_PARSR)
-#processaArquivos(SOURCE_DIR, DEST_DIR, 100)
-#selecionaArquivos(SOURCE_DIR)
-#moveArquivosProcessados(PROCESSADOS_DIR, ARQUIVOSPRONTOS_DIR)
-#moveArquivosValidos(ARQUIVOSPRONTOS_DIR, PROPARSR_DIR)
+main()
