@@ -9,7 +9,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 DIR_PARSR = '/var/projetos/comprasnet_md'
-FILES_DIR = '/var/projetos/proParsr'
+FILES_DIR = '/var/projetos/arquivosProntos'
 
 def pdfToText(arquivoPDF, filename):
     parsr = conect()
@@ -60,7 +60,7 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
     for index, file in enumerate(files):
         #if index == 2:
             #break
-        if index %30 != 0 or index == 0:
+        if index %20 != 0 or index == 0:
             filename = getFilename(file)
             list_files.append(filename)
             #id_licitacao, id_arquivo = getIds(filename)
@@ -74,7 +74,7 @@ def extractTextFromDIR(FILES_DIR, DIR_PARSR):
                     for folder in os.listdir(DIR_PARSR):
                         if folder.find(file_item) != -1 and searchMarkDown(DIR_PARSR, folder) == True:
                             countMd+=1
-                            if countMd >=15:
+                            if countMd >=10:
                                 created = True
                                 #-----------------
                                 filename = getFilename(file)

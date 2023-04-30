@@ -3,11 +3,11 @@ import magic
 import shutil
 from utils.filename import lista as filename_list
 from tqdm import tqdm
-from manipulations.manipulationFile import *
+from manipulacao.manipulationFile import *
 import os
 from pathlib import Path
 
-INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
+#INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
 DIR_ARQUIVOS = 'arquivos/arquivosPDF'
 OUT_DIR = '/var/projetos/arquivos'
 
