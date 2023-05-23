@@ -7,9 +7,9 @@ from manipulacao.manipulationFile import *
 import os
 from pathlib import Path
 
-#INPUT_DATAFRAME = readCsv('lic_2007_2022.csv')
-DIR_ARQUIVOS = 'arquivos/arquivosPDF'
-OUT_DIR = '/var/projetos/arquivos'
+INPUT_DATAFRAME = readCsv('licitacoes-2023.csv')
+DIR_ARQUIVOS = '/var/projetos/DIR_ARQUIVOS'
+OUT_DIR = '/var/projetos/OUT_DIR'
 
 def downloadFile(id_licitacao, id_arquivo, OUT_DIR, DIR_ARQUIVOS):
     try:
@@ -38,4 +38,5 @@ def downloadFiles(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS):
         removeArquivosPDF(DIR_ARQUIVOS)
 
 if __name__ == "__main__":
+    downloadFiles(INPUT_DATAFRAME, OUT_DIR, DIR_ARQUIVOS)
     pass
