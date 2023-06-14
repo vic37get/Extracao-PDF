@@ -1,7 +1,7 @@
 OUT_DIR = '/var/projetos/arquivos/'
 DIR_PARSR = '/var/projetos/comprasnet_md'
 #DIR_PARSR = './teste'
-DEST_DIR = '/var/projetos/comprasnet_arquivos'
+DEST_DIR = '/var/projetos/arquivos'
 #DEST_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
 FILES_DIR = '/home/weslley/arquivosPDF'
 
@@ -47,6 +47,6 @@ def getUnprocessedFiles(FILES_DIR, DIR_PARSR):
     return candidate_files
 
 if __name__ == "__main__":
-    pass
+    #pass
     #getUnprocessedFiles(FILES_DIR, DIR_PARSR)
     moveMarkdownFiles(DIR_PARSR, DEST_DIR)

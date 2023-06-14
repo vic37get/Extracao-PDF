@@ -106,7 +106,7 @@ def selecionaArquivos(SOURCE_DIR):
 
 def processaArquivos(SOURCE_DIR, DEST_DIR, quantidade):
     dfarquivos = pd.read_csv('datasets/arquivosZip.csv')
-    arquivosCandidatos = dfarquivos.loc[dfarquivos['processado'] == 0].head(quantidade)
+    arquivosCandidatos = dfarquivos.loc[dfarquivos['processados'] != 1].head(quantidade)
     for arquivo in tqdm(arquivosCandidatos.index):
         nome_uag = arquivosCandidatos['ID-UAG'][arquivo]
         nome_licitacao = arquivosCandidatos['ID-LICITACAO'][arquivo]
@@ -118,7 +118,7 @@ def processaArquivos(SOURCE_DIR, DEST_DIR, quantidade):
             pass
     dfarquivos.loc[arquivosCandidatos.index, 'processados'] = 1
     dfarquivos.to_csv('datasets/arquivosZip.csv', index=False, encoding='utf-8')
-    
+
 def arquivosValidos(arquivo):
     extensoes_validas = ['.pdf', '.doc', '.docx', '.odt']
     relacao_itens = re.compile('Rela[cç][aã]o', re.IGNORECASE)

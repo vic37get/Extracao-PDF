@@ -21,11 +21,11 @@
   "output": {
     "granularity": "word",
     "includeMarginals": false,
-    "includeDrawings": true,
+    "includeDrawings": false,
     "formats": {
       "json": false,
       "text": false,
-      "csv": true,
+      "csv": false,
       "markdown": true,
       "pdf": false
     }
