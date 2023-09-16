@@ -16,6 +16,4 @@ def converteArquivos(SOURCE_DIR, DEST_DIR):
         caminho_destino = os.path.join(DEST_DIR, arquivo)
         doc_to_docx(caminho_fonte, caminho_destino)
 
-converteArquivos(SOURCE_DIR, DEST_DIR)
-        
-        
+converteArquivos(SOURCE_DIR, DEST_DIR) 

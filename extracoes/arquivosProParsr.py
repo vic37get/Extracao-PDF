@@ -107,6 +107,7 @@ def selecionaArquivos(SOURCE_DIR):
 def processaArquivos(SOURCE_DIR, DEST_DIR, quantidade):
     dfarquivos = pd.read_csv('datasets/arquivosZip.csv')
     arquivosCandidatos = dfarquivos.loc[dfarquivos['processados'] != 1].head(quantidade)
+    print(arquivosCandidatos)
     for arquivo in tqdm(arquivosCandidatos.index):
         nome_uag = arquivosCandidatos['ID-UAG'][arquivo]
         nome_licitacao = arquivosCandidatos['ID-LICITACAO'][arquivo]
@@ -131,7 +132,7 @@ def arquivosValidos(arquivo):
     return False
     
 def main():
-    #processaArquivos(SOURCE_DIR, DEST_DIR, 50000)
+    #processaArquivos(SOURCE_DIR, DEST_DIR, 100000)
     extracao(DEST_DIR, EXTRACT_DIR, DIR_PRO_PARSR)
     
 SOURCE_DIR = '/var/comprasnet_arquivos'

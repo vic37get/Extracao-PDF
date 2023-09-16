@@ -1,9 +1,5 @@
-OUT_DIR = '/var/projetos/arquivos/'
-DIR_PARSR = '/var/projetos/comprasnet_md'
-#DIR_PARSR = './teste'
-DEST_DIR = '/var/projetos/arquivos'
-#DEST_DIR = '/mnt/c/Users/victor.silva/Documents/Repositórios/Extracao-PDF/teste'
-FILES_DIR = '/home/weslley/arquivosPDF'
+DIR_PARSR = '/var/projetos/contratos_md'
+DEST_DIR = '/var/projetos/contratos_arquivos'
 
 from utils.filename import lista as list_ext
 import os
